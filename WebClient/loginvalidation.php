@@ -3,7 +3,7 @@
     
     <?php
     // Initializing GLOBAL SESSION variables
-    $_SESSION['db_server']      = '52.25.145.179:3306';
+    $_SESSION['db_server']      = 'localhost';
     $_SESSION['db_username']    = 'webpage';
     $_SESSION['db_password']    = 'MSFTDota2InHouse';
     $_SESSION['username']       = $_POST['username'];

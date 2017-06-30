@@ -24,7 +24,7 @@
             echo "Saving data to database...<br>";
             $link = mysql_connect('localhost','WebClient','MSFTDota2InHouse')
                 or die( 'Could not connect: ' . mysql_error() );
-            echo "Connected to database.";
+            echo "Connected to database. <br>";
             mysql_select_db('userinfo')
                 or die( 'Could not select database. <br>' );
             
@@ -40,7 +40,7 @@
             }
             else
             {
-                echo "This user name already exists, change to another user name. <br>";
+                echo "This user name already exists, please use another user name. <br>";
                 $RegistrationPhase = 1;
                 goto Form;
             }
