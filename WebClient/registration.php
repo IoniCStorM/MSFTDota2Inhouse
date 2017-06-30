@@ -22,7 +22,7 @@
             $pos2           = convertPos( $_POST['position2'] );
             
             echo "Saving data to database...<br>";
-            $link = mysql_connect('52.25.145.179:3306','webpage','MSFTDota2InHouse')
+            $link = mysql_connect('localhost','WebClient','MSFTDota2InHouse')
                 or die( 'Could not connect: ' . mysql_error() );
             echo "Connected to database.";
             mysql_select_db('userinfo')
