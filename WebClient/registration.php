@@ -117,7 +117,7 @@ Form:
                 </tr>
                 <tr>
                     <td>
-                        1st comfortable position:
+                        1st preferred position:
                     </td>
                     <td>
                         <div TITLE='Carry means position 1, Ganker means position 2/3 and Support means position 4/5'>
@@ -132,7 +132,7 @@ Form:
                 </tr>
                 <tr>
                     <td>
-                        2nd comfortable position:
+                        2nd preferred position:
                     </td>
                     <td>
                         <div TITLE='Carry means position 1, Ganker means position 2/3 and Support means position 4/5'>
