@@ -4,7 +4,7 @@
     <?php
     // Initializing GLOBAL SESSION variables
     $_SESSION['db_server']      = 'localhost';
-    $_SESSION['db_username']    = 'webpage';
+    $_SESSION['db_username']    = 'WebClient';
     $_SESSION['db_password']    = 'MSFTDota2InHouse';
     $_SESSION['username']       = $_POST['username'];
     $_SESSION['errormsg']       = '';
