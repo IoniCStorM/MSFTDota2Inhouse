@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+
+    The Time is:
+    <span id="serverTime"></span>
+
+    <script src="Scripts/jquery-1.6.4.min.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="SignalR/hubs"></script>
+
+    <script>
+        $.connection.hub.start().done(function () {
+
+            $.connection.messageHub.server.broadCastServerTime();
+        });
+
+        $.connection.messageHub.client.MessageReceiver = function (message) {
+            $("#serverTime").text(message);
+        }
+    </script>
+
+</body>
+</html>
