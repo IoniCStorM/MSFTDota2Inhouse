@@ -6,7 +6,7 @@
     <title>Welcome to Microsoft Dota2 InHouse League</title>
     <script type="text/javascript" src="main.js"></script>
 </head>
-    <body onload="onPageLoad()">
+<body onload="onPageLoad()">
     <table style="width: 100%;" >
         <tr>
             <td style="width:20%">
