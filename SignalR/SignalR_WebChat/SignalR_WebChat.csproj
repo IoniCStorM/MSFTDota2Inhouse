@@ -114,12 +114,11 @@
     <None Include="Properties\PublishProfiles\FTPPublish.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="index.html" />
-    <Content Include="Scripts\MessengerScript.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.2.js" />
     <Content Include="Scripts\jquery.signalR-2.2.2.min.js" />
-    <Content Include="Scripts\MessengerScript2.js" />
+    <Content Include="Scripts\Chat.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
