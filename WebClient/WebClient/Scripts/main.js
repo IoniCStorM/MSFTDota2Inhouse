@@ -35,30 +35,40 @@ function updatesPlayer() {
     sPlayer.options.add( NewPlayer );
 }
 
+function UpdatePlayerQueueList(username, Signup) {
+    ChatLogAdd("UpdatePlayerQueueList: username:" + username + "\n");
+    if(Signup)
+    {
+        ChatLogAdd("UpdatePlayerQueueList: Signup: true \n" );
+        var NewPlayer = document.createElement("option");
+        NewPlayer.text = username;
+        sCurrentGamePlayer.options.add(NewPlayer);
+    }
+    else
+    {
+        ChatLogAdd("UpdatePlayerQueueList: Signup: false \n");
+        var i;
+        for (i = 0; i < sCurrentGamePlayer.length; i++) {
+            if (sCurrentGamePlayer.options[i].text == username) {
+                sCurrentGamePlayer.remove(i);
+                break;
+            }
+        }
+    }
+}
+
 function onbtnSignUpClick() {
     if( bSigned == false )
     {
-        var NewPlayer = document.createElement("option");
-        NewPlayer.text = strUserId;
-        sCurrentGamePlayer.options.add( NewPlayer );
-        ChatLogAdd( strUserId + " has signed up!\n" );
-        
+        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML);
+        // Change the button text to Abandon
         btnSignUp.innerHTML = "Abandon";
         bSigned = true;
     }
     else
     {
-        var i;
-        for( i = 0; i < sCurrentGamePlayer.length; i++ )
-        {
-            if( sCurrentGamePlayer.options[i].text == strUserId )
-            {
-                sCurrentGamePlayer.remove(i);
-                break;
-            }
-        }
-        ChatLogAdd( strUserId + " has abandoned!\n" );
-        
+        $.connection.messageHub.server.abandonSignUpForMatch(idUser.innerHTML);
+        // Change the button text to Sign Up!
         btnSignUp.innerHTML = "Sign Up!";
         bSigned = false;
     }

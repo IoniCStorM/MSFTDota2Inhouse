@@ -39,6 +39,10 @@
         $.connection.messageHub.client.ChatMessageReceiver = function (message) {
             ChatLogAdd(message);
         }
+
+        $.connection.messageHub.client.UpdatePlayerQueueListReceiver = function (username, Signup) {
+            UpdatePlayerQueueList(username, Signup);
+        }
     </script>
 
     <table style="width: 100%;">
@@ -50,8 +54,6 @@
                             <!--Current game list-->
                             Signed up Players: <button id="btnSignUp" onclick="onbtnSignUpClick()">Sign Up!</button>
                             <select id="sCurrentGamePlayer" size="10" style="width:100%">
-                                <option>Player1</option>
-                                <option>Player2</option>
                             </select>
                         </td>
                     </tr>
