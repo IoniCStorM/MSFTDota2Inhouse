@@ -64,11 +64,16 @@ function onbtnSignUpClick() {
 }
 
 function SendMessage(message) {
-    ChatLogAdd(message + "\n");
+    // Clear the input first 
     tChatInput.value = "";
+
+    // ChatLogAdd(message + "\n");
 
     // After adding the chat message to the chat area, also
     // send the chat message to the server.
+
+    $.connection.messageHub.server.broadCastMessage(strUserId, message);
+
 }
 
 function ontChatInputKeyDown(event) {

@@ -26,10 +26,15 @@ namespace SignalR_WebChat
             Clients.All.MessageReceiver(DateTime.Now);
         }
 
+        public void BroadCastMessage(string username, string message)
+        {
+            Clients.All.ChatMessageReceiver(username + ":" + message + "\n");
+        }
+
         public override Task OnDisconnected(bool stopCalled)
         {
             Clients.All.MessageReceiver(DateTime.Now);
-            Clients.All.ChatMessageReceiver("Disconnected \n");
+            BroadCastMessage("A user", "Disconnected \n");
             return base.OnDisconnected(stopCalled);
         }
     }

@@ -5,14 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR_WebChat", "SignalR_WebChat\SignalR_WebChat.csproj", "{2AB540F5-7EE2-4947-8976-CABD2F439707}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{0F8D7425-CF5E-4D62-B877-8E816280F380}"
-	ProjectSection(SolutionItems) = preProject
-		PublishScripts\AzureVMPublishModule.psm1 = PublishScripts\AzureVMPublishModule.psm1
-		PublishScripts\Publish-WebApplicationVM.ps1 = PublishScripts\Publish-WebApplicationVM.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configurations", "Configurations", "{12295D0A-B684-4D8D-A361-BCE2AB601F77}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,8 +18,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{12295D0A-B684-4D8D-A361-BCE2AB601F77} = {0F8D7425-CF5E-4D62-B877-8E816280F380}
 	EndGlobalSection
 EndGlobal
