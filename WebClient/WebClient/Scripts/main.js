@@ -34,6 +34,7 @@ function updatesPlayer() {
     NewPlayer.text = strUserId + " " + playerState.idle;
     sPlayer.options.add( NewPlayer );
 }
+
 function onbtnSignUpClick() {
     if( bSigned == false )
     {

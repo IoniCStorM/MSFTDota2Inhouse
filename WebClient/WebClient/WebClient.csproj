@@ -98,10 +98,11 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="index.html" />
+    <Content Include="index.php" />
     <Content Include="loginvalidation.php" />
     <Content Include="main.php" />
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\FTPPublish.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
