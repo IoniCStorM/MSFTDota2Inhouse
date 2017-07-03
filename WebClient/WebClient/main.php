@@ -11,11 +11,22 @@
     <script src="Scripts/jquery.signalR-2.2.2.min.js"></script>
     <script src="SignalR/hubs"></script>
 
-	<form action="index.php" method="GET">
-		<input type="submit" value="Log Out">
-	</form>
+    <form action="index.php" method="GET">
+        <input type="submit" value="Log Out">
+    </form>
     The Time is:<span id="serverTime"></span>
-
+    
+    <?php
+    // Ensure the user has logged in
+    if( $_SESSION['username'] == "" )
+    {
+        $_SESSION['errormsg'] = "Unknown user.<br>";
+        // Redirects back to the login page.
+        header('Location: index.php');
+        exit;
+    }
+    ?>
+    
     <script>
         $.connection.hub.start().done(function () {
             $.connection.messageHub.server.broadCastServerTime();
