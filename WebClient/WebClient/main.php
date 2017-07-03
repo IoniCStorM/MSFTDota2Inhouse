@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <?php session_start(); ?>
+<?php $_SESSION['ranking'] = 1500; ?>
 <head>
     <title>Welcome to Microsoft Dota2 InHouse League</title>
     <script type="text/javascript" src="Scripts/main.js"></script>
