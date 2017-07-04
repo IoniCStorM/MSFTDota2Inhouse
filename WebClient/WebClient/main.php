@@ -14,7 +14,7 @@
     <form action="index.php" method="GET">
         <input type="submit" value="Log Out">
     </form>
-    The Time is:<span id="serverTime"></span>
+    The Server Time is:<span id="serverTime"></span>
     
     <?php
     // Ensure the user has logged in
