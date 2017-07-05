@@ -60,14 +60,14 @@ function UpdatePlayerQueueList(username, Signup) {
 function onbtnSignUpClick() {
     if( bSigned == false )
     {
-        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML);
+        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML, intUserMMR);
         // Change the button text to Abandon
         btnSignUp.innerHTML = "Abandon";
         bSigned = true;
     }
     else
     {
-        $.connection.messageHub.server.abandonSignUpForMatch(idUser.innerHTML);
+        $.connection.messageHub.server.abandonSignUpForMatch(idUser.innerHTML, intUserMMR);
         // Change the button text to Sign Up!
         btnSignUp.innerHTML = "Sign Up!";
         bSigned = false;

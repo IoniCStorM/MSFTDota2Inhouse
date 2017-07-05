@@ -30,6 +30,7 @@
     <script>
         $.connection.hub.start().done(function () {
             $.connection.messageHub.server.broadCastServerTime();
+			$.connection.messageHub.server.populateCurrentPlayerQueueList();
         });
 
         $.connection.messageHub.client.MessageReceiver = function (message) {
