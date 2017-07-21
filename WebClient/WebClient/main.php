@@ -28,8 +28,12 @@
     ?>
     
     <script>
+		idUser = document.getElementById("idUser");
+
         $.connection.hub.start().done(function () {
             $.connection.messageHub.server.broadCastServerTime();
+			$.connection.messageHub.server.connectUser(idUser.innerHTML);
+			$.connection.messageHub.server.populateCurrentPlayerList();
 			$.connection.messageHub.server.populateCurrentPlayerQueueList();
         });
 
@@ -43,6 +47,10 @@
 
         $.connection.messageHub.client.UpdatePlayerQueueListReceiver = function (username, Signup) {
             UpdatePlayerQueueList(username, Signup);
+        }
+
+		$.connection.messageHub.client.UpdateOnlinePlayerListReceiver = function (username, Add) {
+            UpdatePlayerList(username, Add);
         }
     </script>
 
@@ -62,11 +70,7 @@
                         <td style="width: 20%; vertical-align:top">
                             <!--Player list-->
                             Players On-line:
-                            <select id="sPlayer" size="12" ondblclick="onsPlayerdblclick()" style="width:100%">
-                                <option>Player1</option>
-                                <option>Player2</option>
-                                <option>Player3</option>
-                            </select>
+                            <select id="sPlayer" size="12" ondblclick="onsPlayerdblclick()" style="width:100%"/>
                         </td>
                     </tr>
                 </table>

@@ -25,14 +25,28 @@ function onPageLoad() {
     
     intUserMMR = 1500;
     strUserId = idUser.innerHTML + "(" + intUserMMR.toString() + ")";
-    
-    updatesPlayer();
+
 }
 
-function updatesPlayer() {
-    var NewPlayer = document.createElement("option");
-    NewPlayer.text = strUserId + " " + playerState.idle;
-    sPlayer.options.add( NewPlayer );
+function UpdatePlayerList(UserName, Add) {
+    if (Add)
+    {
+        ChatLogAdd("UpdatePlayerList: Add: true, UserName: " + UserName + "\n");
+        var Player = document.createElement("option");
+        Player.text = UserName;
+        sPlayer.options.add(Player);
+    }
+    else
+    {
+        ChatLogAdd("UpdatePlayerList: Add: false, UserName: " + UserName +"\n");
+        var i;
+        for (i = 0; i < sPlayer.length; i++) {
+            if (sPlayer.options[i].text == UserName) {
+                sPlayer.remove(i);
+                break;
+            }
+        }
+    }
 }
 
 function UpdatePlayerQueueList(username, Signup) {
