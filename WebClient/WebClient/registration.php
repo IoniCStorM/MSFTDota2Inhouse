@@ -22,17 +22,24 @@
             $pos2           = convertPos( $_POST['position2'] );
             
             echo "Saving data to database...<br>";
-            $link = mysql_connect('localhost','WebClient','MSFTDota2InHouse')
-                or die( 'Could not connect: ' . mysql_error() );
-            echo "Connected to database. <br>";
-            mysql_select_db('userinfo')
-                or die( 'Could not select database. <br>' );
-            
-            $query = sprintf("SELECT * FROM `basicinfo` WHERE `username` LIKE '%s'", $username);
-            $result = mysql_query( $query )
-                or die( 'Query failed: ' . mysql_error() );
-            
-            $fetched_result = mysql_fetch_array( $result, MYSQL_ASSOC );
+			$mysqli = new mysqli($_SESSION['db_server'],$_SESSION['db_username'],$_SESSION['db_password'],'userinfo');
+			if ($mysqli->connect_errno) {
+				echo "Failed to connect to MySQL(" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+			}
+
+			if (!($stmt = $mysqli->prepare("SELECT * FROM `basicinfo` WHERE `username` LIKE ?"))) {
+				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			}
+
+			if(!$stmt->bind_param('s', $username)) {
+				echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+			}
+
+			if(!$stmt->execute()){
+				echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+			}
+
+			$fetched_result = $stmt->get_result()->fetch_assoc();
             
             if( $fetched_result == FALSE )
             {
@@ -45,27 +52,29 @@
                 goto Form;
             }
             
-            $password_hased = password_hash($password, PASSWORD_DEFAULT);
-            
-            $query =  sprintf( "INSERT INTO `userinfo`.`basicinfo` (`username`, `password`, `steamprofile`, `1stPos`, `2ndPos`) VALUES ( '%s', '%s', '%s', '%s', '%s');",
-                                                                    $username, $password_hased, $steamprofile, $pos1, $pos2 );
-            $result = mysql_query( $query )
-                or die( 'Query failed: ' . mysql_error() );
-            
-            if( $result )
-            {
-                echo "Registration succeeded, please return to the login page and login.<br>";
+            $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+			if (!($stmt = $mysqli->prepare("INSERT INTO `userinfo`.`basicinfo` (`username`, `password`, `steamprofile`, `1stPos`, `2ndPos`) VALUES ( ?, ?, ?, ?, ?);"))) {
+				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			}
+
+			if(!$stmt->bind_param('sssss', $username, $password_hashed, $steamprofile, $pos1, $pos2)) {
+				echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+			}
+
+			if($stmt->execute()){
+				echo "Registration succeeded, please return to the login page and login.<br>";
                 $_SESSION['username']       = $username;
                 printf("
                 <form action='index.php' method='POST'>
                     <input type='submit' value='Return'/>
                 </form>
                 ");
-            }
-            else
-            {
-                echo "Registration failed, please contact admin (alias:Dota2InHouseAdmin) for help. <br>";
-            }
+			}
+			else
+			{
+				echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
+				echo "Registration failed, please contact admin (alias:Dota2InHouseAdmin) for help. <br>";
+			}
             
             $RegistrationPhase = 2;
         }

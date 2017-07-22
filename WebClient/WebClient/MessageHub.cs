@@ -131,7 +131,7 @@ namespace WebClient
             Clients.All.UpdatePlayerQueueListReceiver(username, true);
             Clients.All.ChatMessageReceiver(username + " has signed up!\n");
 
-            if(MatchQueue.Count == 2)
+            if(MatchQueue.Count == 4)
             {
                 CreateMatch();
             }

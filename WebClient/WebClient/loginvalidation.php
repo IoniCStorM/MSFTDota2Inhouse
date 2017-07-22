@@ -10,48 +10,51 @@
     $_SESSION['errormsg']       = '';
     
     $username = $_POST['username'];
-    
-    $link = mysql_connect($_SESSION['db_server'],$_SESSION['db_username'],$_SESSION['db_password'])
-        or die( 'Could not connect: ' . mysql_error() );
-    $_SESSION['db_link'] = $link;
-    echo "Connected to database.<br>";
-    mysql_select_db('userinfo')
-        or die( 'Could not select database. <br>' );
-    
-    echo "Checking username.<br>";
-    $query = sprintf("SELECT * FROM `basicinfo` WHERE `username` LIKE '%s'", $username);
-    $result = mysql_query( $query )
-        or die( 'Query failed: ' . mysql_error() );
-        
-    
-    $fetched_result = mysql_fetch_array( $result, MYSQL_ASSOC );
-    
-    if( $fetched_result == FALSE )
-    {
-        $_SESSION['errormsg'] = "Unknown user.<br>";
+
+	$mysqli = new mysqli($_SESSION['db_server'],$_SESSION['db_username'],$_SESSION['db_password'],'userinfo');
+	if ($mysqli->connect_errno) {
+		echo "Failed to connect to MySQL(" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+	}
+
+	if (!($stmt = $mysqli->prepare("SELECT * FROM `basicinfo` WHERE `username` LIKE ?"))) {
+		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+
+	if(!$stmt->bind_param('s', $username)) {
+		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+	}
+
+	if(!$stmt->execute()){
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+	}
+
+	$fetched_result = $stmt->get_result()->fetch_assoc();
+
+	if ($fetched_result == FALSE)
+	{
+		$_SESSION['errormsg'] = "Unknown user.<br>";
         // Redirects back to the login page.
         header('Location: index.php');
         exit;
-    }
-    else
+	}
+	else
     {
         echo "Checking password.<br>";
         if( password_verify( $_POST['password'], $fetched_result['password'] ) )
         {
-            echo "Valid password. <br>";
-            // Redirects back to the main page.
+            // Redirects to the main page.
             header('Location: main.php');
             exit;
         }
         else
         {
-            echo "Invalid password.<br>";
             $_SESSION['errormsg'] = "Invalid password.<br>";
+			// Redirects back to the login page.
             header('Location: index.php');
             exit;
         }
     }
-    
+
     ?>
     
     <head>
