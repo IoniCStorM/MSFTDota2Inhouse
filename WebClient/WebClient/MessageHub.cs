@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.SignalR;
+using MySql.Data.MySqlClient;
+
 
 namespace WebClient
 {
@@ -86,8 +88,11 @@ namespace WebClient
             public string strUsername;
             public int intMMR;
         };
-        static List<Player> MatchQueue = new List<Player>(10);
-        private readonly static ConnectionMapping _connections = new ConnectionMapping();
+
+        static List<Player> g_MatchQueue = new List<Player>(10);
+        private readonly static ConnectionMapping g_Connections = new ConnectionMapping();
+        static MySqlConnection g_MySQLConnection = new MySqlConnection("server=localhost;Database=userinfo;Uid=WebClient;Pwd=MSFTDota2InHouse;");
+
         public void BroadCastServerTime()
         {
             Clients.All.MessageReceiver(DateTime.Now);
@@ -105,16 +110,16 @@ namespace WebClient
 
         public void PopulateCurrentPlayerQueueList()
         {
-            for(int i = 0; i < MatchQueue.Count; i++)
+            for(int i = 0; i < g_MatchQueue.Count; i++)
             {
-                Clients.Caller.UpdatePlayerQueueListReceiver(MatchQueue[i].strUsername, true);
+                Clients.Caller.UpdatePlayerQueueListReceiver(g_MatchQueue[i].strUsername, true);
             }
         }
 
         public void PopulateCurrentPlayerList()
         {
             Clients.Caller.ChatMessageReceiver("UpdatingCurrentPlayerList\n");
-            foreach(string userName in _connections.GetKeys())
+            foreach(string userName in g_Connections.GetKeys())
             {
                 Clients.Caller.ChatMessageReceiver( userName + " is in game.\n");
                 Clients.Caller.UpdateOnlinePlayerListReceiver(userName, true);
@@ -126,12 +131,12 @@ namespace WebClient
             Player newPlayer = new Player();
             newPlayer.strUsername = username;
             newPlayer.intMMR = 1500;
-            MatchQueue.Add(newPlayer);
+            g_MatchQueue.Add(newPlayer);
 
             Clients.All.UpdatePlayerQueueListReceiver(username, true);
             Clients.All.ChatMessageReceiver(username + " has signed up!\n");
 
-            if(MatchQueue.Count == 4)
+            if(g_MatchQueue.Count == 4)
             {
                 CreateMatch();
             }
@@ -142,7 +147,7 @@ namespace WebClient
             Player existingPlayer = new Player();
             existingPlayer.strUsername = username;
             existingPlayer.intMMR = 1500;
-            MatchQueue.Remove(existingPlayer);
+            g_MatchQueue.Remove(existingPlayer);
 
             Clients.All.UpdatePlayerQueueListReceiver(username, false);
             Clients.All.ChatMessageReceiver(username + " has abandonned!\n");
@@ -150,9 +155,38 @@ namespace WebClient
 
         public void ConnectUser(string UserName)
         {
-            _connections.Add(UserName, Context.ConnectionId);
             Clients.All.ChatMessageReceiver(UserName + " has connected.\n");
+            g_Connections.Add(UserName, Context.ConnectionId);
+
+            string queryString = "SELECT * FROM `basicinfo` WHERE `username` LIKE '" + UserName + "'";
+            MySqlCommand command = new MySqlCommand(queryString, g_MySQLConnection);
+            if (g_MySQLConnection.State != System.Data.ConnectionState.Open)
+            {
+                Clients.All.ChatMessageReceiver("Connection String:" + g_MySQLConnection.ConnectionString + "\n");
+                Clients.All.ChatMessageReceiver("Connection State:" + g_MySQLConnection.State + "\n");
+                try
+                {
+                    g_MySQLConnection.Open();
+                } catch (Exception e)
+                {
+                    Clients.All.ChatMessageReceiver("Connection Failed:" + e.Message + "\n");
+                }
+            }
+            
+            if (g_MySQLConnection.State != System.Data.ConnectionState.Open)
+            {
+                Clients.All.ChatMessageReceiver("Cannot open to database\n");
+            }
+            Clients.All.ChatMessageReceiver("I'm here2.\n");
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Clients.All.ChatMessageReceiver(UserName + "'s password is: " + reader[2]);
+            }
+
             Clients.Others.UpdateOnlinePlayerListReceiver(UserName, true);
+                        
         }
 
         public override Task OnConnected()
@@ -165,7 +199,7 @@ namespace WebClient
             Clients.All.MessageReceiver(DateTime.Now);
 
             string userName;
-            userName = _connections.RemoveConnectionId(Context.ConnectionId);
+            userName = g_Connections.RemoveConnectionId(Context.ConnectionId);
 
             Clients.All.ChatMessageReceiver(userName + " has disconnected.\n");
             Clients.All.UpdateOnlinePlayerListReceiver(userName, false);
