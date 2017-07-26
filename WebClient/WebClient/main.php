@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <?php session_start(); ?>
-<?php $_SESSION['ranking'] = 1500; ?>
 <head>
     <title>Welcome to Microsoft Dota2 InHouse League</title>
     <script type="text/javascript" src="Scripts/main.js"></script>
@@ -52,6 +51,10 @@
 		$.connection.messageHub.client.UpdateOnlinePlayerListReceiver = function (username, Add) {
             UpdatePlayerList(username, Add);
         }
+
+		$.connection.messageHub.client.UpdatePlayerMMRReceiver = function (MMR) {
+			UpdatePlayerMMR(MMR);
+		}
     </script>
 
     <table style="width: 100%;">
@@ -60,17 +63,26 @@
                 <table>
                     <tr style="height: 20%; width:20%">
                         <td style="width: 20%; vertical-align:top">
-                            <!--Current game list-->
+                            <!--Current signed up player list-->
                             Signed up Players: <button id="btnSignUp" onclick="onbtnSignUpClick()">Sign Up!</button>
-                            <select id="sCurrentGamePlayer" size="10" style="width:100%">
+                            <select id="sSignedUpPlayers" size="10" style="width:100%">
                             </select>
                         </td>
                     </tr>
-                    <tr style="height: 80%; width:20%;">
+                    <tr style="height: 60%; width:20%;">
                         <td style="width: 20%; vertical-align:top">
                             <!--Player list-->
                             Players On-line:
                             <select id="sPlayer" size="12" ondblclick="onsPlayerdblclick()" style="width:100%"/>
+                        </td>
+                    </tr>
+					<tr style="height: 60%; width:20%;">
+                        <td style="width: 20%; vertical-align:top">
+                            <!--Current game list-->
+                            Ongoing Games:
+                            <select id="sGames" size="12" ondblclick="onsGamesdblclick()" style="width:100%">
+                            <option>123</option>
+                            </select>
                         </td>
                     </tr>
                 </table>
@@ -79,7 +91,7 @@
                 <table style="width:100%">
                     <tr>
                         <td>
-                            <strong id="idUser"><?php echo($_SESSION['username']);?></strong><strong><?php echo( " - " . $_SESSION['ranking']); ?></strong></br>
+                            <strong id="idUser"><?php echo($_SESSION['username']);?></strong><strong> - </strong><strong id="UserMMR">0</strong></br>
                             Chat:
                             <textarea id="taChat" rows="19" col="auto" readonly style="background-color:white; width:100%; height:inherit"></textarea>
                         </td>

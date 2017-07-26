@@ -98,6 +98,11 @@ namespace WebClient
             Clients.All.MessageReceiver(DateTime.Now);
         }
 
+        public void BroadCastAllMessage(string message)
+        {
+            Clients.All.ChatMessageReceiver(message + "\n");
+        }
+
         public void BroadCastMessage(string username, string message)
         {
             Clients.All.ChatMessageReceiver(username + ":" + message + "\n");
@@ -126,31 +131,31 @@ namespace WebClient
             }
         }
 
-        public void SignUpForMatch(string username, int MMR)
+        public void SignUpForMatch(string username, bool fSignup)
         {
-            Player newPlayer = new Player();
-            newPlayer.strUsername = username;
-            newPlayer.intMMR = 1500;
-            g_MatchQueue.Add(newPlayer);
-
-            Clients.All.UpdatePlayerQueueListReceiver(username, true);
-            Clients.All.ChatMessageReceiver(username + " has signed up!\n");
-
-            if(g_MatchQueue.Count == 4)
+            Player Player = new Player();
+            Player.strUsername = username;
+            Player.intMMR = 1500;
+            if (fSignup)
             {
-                CreateMatch();
+                g_MatchQueue.Add(Player);
+
+                Clients.All.UpdatePlayerQueueListReceiver(username, true);
+                Clients.All.ChatMessageReceiver(username + " has signed up!\n");
+
+                if (g_MatchQueue.Count == 4)
+                {
+                    CreateMatch();
+                }
             }
-        }
+            else
+            {
+                g_MatchQueue.Remove(Player);
 
-        public void AbandonSignUpForMatch(string username, int MMR)
-        {
-            Player existingPlayer = new Player();
-            existingPlayer.strUsername = username;
-            existingPlayer.intMMR = 1500;
-            g_MatchQueue.Remove(existingPlayer);
-
-            Clients.All.UpdatePlayerQueueListReceiver(username, false);
-            Clients.All.ChatMessageReceiver(username + " has abandonned!\n");
+                Clients.All.UpdatePlayerQueueListReceiver(username, false);
+                Clients.All.ChatMessageReceiver(username + " has abandonned!\n");
+            }
+            
         }
 
         public void ConnectUser(string UserName)
@@ -158,12 +163,13 @@ namespace WebClient
             Clients.All.ChatMessageReceiver(UserName + " has connected.\n");
             g_Connections.Add(UserName, Context.ConnectionId);
 
+            // Get player UserID
+            string UserID = "";
+            UInt32 MMR = 0;
             string queryString = "SELECT * FROM `basicinfo` WHERE `username` LIKE '" + UserName + "'";
             MySqlCommand command = new MySqlCommand(queryString, g_MySQLConnection);
             if (g_MySQLConnection.State != System.Data.ConnectionState.Open)
             {
-                Clients.All.ChatMessageReceiver("Connection String:" + g_MySQLConnection.ConnectionString + "\n");
-                Clients.All.ChatMessageReceiver("Connection State:" + g_MySQLConnection.State + "\n");
                 try
                 {
                     g_MySQLConnection.Open();
@@ -177,16 +183,39 @@ namespace WebClient
             {
                 Clients.All.ChatMessageReceiver("Cannot open to database\n");
             }
-            Clients.All.ChatMessageReceiver("I'm here2.\n");
             MySqlDataReader reader = command.ExecuteReader();
-
             while (reader.Read())
             {
-                Clients.All.ChatMessageReceiver(UserName + "'s password is: " + reader[2]);
+                UserID = reader[0].ToString();
             }
+            reader.Close();
+
+            // Get player MMR
+            command.CommandText = "SELECT * FROM `playerdetails` WHERE `UserID` LIKE '" + UserID + "'";
+            command.CommandType = System.Data.CommandType.Text;
+            
+            reader = command.ExecuteReader();
+
+            if (!reader.HasRows)
+            {
+                // No row exists, adding a row
+                command.CommandText = "INSERT INTO `playerdetails` (`UserID`, `MMR`, `Win`, `Loss`) VALUES ('" + UserID + "', '1500', '0', '0')";
+                command.ExecuteNonQuery();
+                MMR = 1500;
+            }
+            else
+            {
+                while (reader.Read())
+                {
+                    MMR = Convert.ToUInt32(reader[1]);
+                }
+            }
+            reader.Close();
+
+            BroadCastAllMessage(UserName + "'s MMR is: " + MMR);
 
             Clients.Others.UpdateOnlinePlayerListReceiver(UserName, true);
-                        
+            Clients.Caller.UpdatePlayerMMRReceiver(MMR);
         }
 
         public override Task OnConnected()

@@ -2,11 +2,12 @@ var taChat = null;
 var idUser = null;
 var btnSignUp = null;
 var tChatInput = null;
-var sCurrentGamePlayer = null;
+var sSignedUpPlayers = null;
 var sPlayer = null;
+var sGames = null;
+var UserMMR = null;
 
 var strUserId = null;
-var intUserMMR = 0;
 var bSigned = false;
 
 playerState = {
@@ -19,12 +20,13 @@ function onPageLoad() {
     taChat = document.getElementById("taChat");
     idUser = document.getElementById("idUser");
     tChatInput = document.getElementById("tChatInput");
-    sCurrentGamePlayer = document.getElementById("sCurrentGamePlayer");
+    sSignedUpPlayers = document.getElementById("sSignedUpPlayers");
     sPlayer = document.getElementById("sPlayer");
+    sGames = document.getElementById("sGames");
     btnSignUp = document.getElementById("btnSignUp");
+    UserMMR = document.getElementById("UserMMR");
     
-    intUserMMR = 1500;
-    strUserId = idUser.innerHTML + "(" + intUserMMR.toString() + ")";
+    strUserId = idUser.innerText + "(" + UserMMR.innerText + ")";
 
 }
 
@@ -56,32 +58,38 @@ function UpdatePlayerQueueList(username, Signup) {
         ChatLogAdd("UpdatePlayerQueueList: Signup: true \n" );
         var NewPlayer = document.createElement("option");
         NewPlayer.text = username;
-        sCurrentGamePlayer.options.add(NewPlayer);
+        sSignedUpPlayers.options.add(NewPlayer);
     }
     else
     {
         ChatLogAdd("UpdatePlayerQueueList: Signup: false \n");
         var i;
-        for (i = 0; i < sCurrentGamePlayer.length; i++) {
-            if (sCurrentGamePlayer.options[i].text == username) {
-                sCurrentGamePlayer.remove(i);
+        for (i = 0; i < sSignedUpPlayers.length; i++) {
+            if (sSignedUpPlayers.options[i].text == username) {
+                sSignedUpPlayers.remove(i);
                 break;
             }
         }
     }
 }
 
+function UpdatePlayerMMR(MMR) {
+    UserMMR.innerText = MMR;
+}
+
 function onbtnSignUpClick() {
     if( bSigned == false )
     {
-        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML, intUserMMR);
+        ChatLogAdd("Signing up!\n");
+        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML, true);
         // Change the button text to Abandon
         btnSignUp.innerHTML = "Abandon";
         bSigned = true;
     }
     else
     {
-        $.connection.messageHub.server.abandonSignUpForMatch(idUser.innerHTML, intUserMMR);
+        ChatLogAdd("Abandonning!\n");
+        $.connection.messageHub.server.signUpForMatch(idUser.innerHTML, false);
         // Change the button text to Sign Up!
         btnSignUp.innerHTML = "Sign Up!";
         bSigned = false;
@@ -113,6 +121,26 @@ function ontChatInputKeyDown(event) {
 function onsPlayerdblclick() {
     ChatLogAdd("123 \n");
     
+}
+
+function onsGamesdblclick() {
+    var form = document.createElement("form");
+    form.setAttribute("method", "post");
+    form.setAttribute("action", "GamePage.php");
+    form.setAttribute("target", "view");
+
+    var hiddenField = document.createElement("input");
+
+    hiddenField.setAttribute("type", "hidden");
+    hiddenField.setAttribute("name", "GameID");
+    hiddenField.setAttribute("value", sGames.options[sGames.selectedIndex].text);
+
+    form.appendChild(hiddenField);
+    document.body.appendChild(form);
+
+    window.open('', 'view');
+
+    form.submit();
 }
 
 function ChatLogAdd( string )
