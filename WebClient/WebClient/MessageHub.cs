@@ -9,6 +9,8 @@ using MySql.Data.MySqlClient;
 
 namespace WebClient
 {
+    #define MAXPLAYERINGAME 4
+
     public class ConnectionMapping
     {
         //
@@ -111,6 +113,16 @@ namespace WebClient
         public void CreateMatch()
         {
             Clients.All.ChatMessageReceiver("Lobby is full, creating match!\n");
+
+            // Get the MMR of all the players in the queue
+
+            // Adding players into teams in the following manner:
+            // teamA[0] = Player0, teamA[1] = Player3, teamA[2] = Player4, teamA[3] = Player7, teamA[4] = Player8
+            // teamB[0] = Player1, teamB[1] = Player2, teamB[2] = Player5, teamB[3] = Player6, teamA[4] = Player9
+
+            // Send SQL to create the game
+
+            // Notify clients a new game has been created, and empty the player queue list
         }
 
         public void PopulateCurrentPlayerQueueList()
@@ -138,14 +150,21 @@ namespace WebClient
             Player.intMMR = 1500;
             if (fSignup)
             {
-                g_MatchQueue.Add(Player);
-
-                Clients.All.UpdatePlayerQueueListReceiver(username, true);
-                Clients.All.ChatMessageReceiver(username + " has signed up!\n");
-
-                if (g_MatchQueue.Count == 4)
+                if (g_MatchQueue.Count < MAXPLAYERINGAME)
                 {
-                    CreateMatch();
+                    g_MatchQueue.Add(Player);
+
+                    Clients.All.UpdatePlayerQueueListReceiver(username, true);
+                    Clients.All.ChatMessageReceiver(username + " has signed up!\n");
+
+                    if (g_MatchQueue.Count == MAXPLAYERINGAME)
+                    {
+                        CreateMatch();
+                    }
+                }
+                else
+                {
+                    Clients.Caller.ChatMessageReceiver("Lobby is full, please wait.\n")
                 }
             }
             else

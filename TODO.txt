@@ -14,3 +14,7 @@ Double click player ID to show profile
 MMR update
 Game arrangement
 Game lobby info
+Bunch of validations:
+    UserName validation
+    UserName length
+    MSFT alias/Email verification

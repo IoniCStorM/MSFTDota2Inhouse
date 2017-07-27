@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<?php session_start(); ?>
+<head>
+    <title>Game <?php echo $_POST['GameID']?></title>
+    <style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+<body>
+    <table align="center">
+        <tr><th colspan="2"><strong> <center>Game ID: <?php echo $_POST['GameID']?></center> </strong></th></tr>
+        <tr><th colspan="2"><strong> <center>Game creation time: <?php echo $_POST['GameCreationTime']?></center> </strong></th></tr>
+        <tr><th colspan="2"><strong> <center>Password: <?php echo $_POST['HostPlayerID']?></center> </strong></th></tr>
+        <tr>
+                <tr>
+                    <td align="center"><strong>Radiant</strong></td>
+                    <td align="center"><strong>Dire</strong></td>
+                </tr>
+                <tr>
+                    <td>Player1</td>
+                    <td>Player2</td>
+                </tr>
+                <tr>
+                    <td>Player3</td>
+                    <td>Player4</td>
+                </tr>
+                <tr>
+                    <td>Player5</td>
+                    <td>Player6</td>
+                </tr>
+                <tr>
+                    <td>Player7</td>
+                    <td>Player8</td>
+                </tr>
+                <tr>
+                    <td>Player9</td>
+                    <td>Player10</td>
+                </tr>
+        </tr>
+        <tr><th colspan="2"><strong>Host: <?php echo $_POST['HostPlayerID']?></strong></th></tr>
+        <tr><th colspan="2">
+            <button id="btnWin" onclick="onbtnWinClick()">Win</button>
+            <button id="btnLoss" onclick="onbtnLossClick()">Loss</button>
+            <button id="btnDNF" onclick="onbtnDNFClick()">Did not finish</button>
+            </th></tr>
+    </table>
+</body>
+</html>
