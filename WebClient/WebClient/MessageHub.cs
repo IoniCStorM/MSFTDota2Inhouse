@@ -9,8 +9,6 @@ using MySql.Data.MySqlClient;
 
 namespace WebClient
 {
-    #define MAXPLAYERINGAME 4
-
     public class ConnectionMapping
     {
         //
@@ -85,10 +83,16 @@ namespace WebClient
 
     public class MessageHub : Hub
     {
+        public const bool isDebugOn = true;
+        public const uint MAXPLAYERINGAME = 4;
+
         private struct Player
         {
-            public string strUsername;
-            public int intMMR;
+            public string UserName;
+            public string UserID;
+            public uint MMR;
+            public uint Win;
+            public uint Loss;
         };
 
         static List<Player> g_MatchQueue = new List<Player>(10);
@@ -105,6 +109,14 @@ namespace WebClient
             Clients.All.ChatMessageReceiver(message + "\n");
         }
 
+        public void BroadCastAllMessageDebug(string message)
+        {
+            if (isDebugOn)
+            {
+                Clients.All.ChatMessageReceiver(message + "\n");
+            }
+        }
+
         public void BroadCastMessage(string username, string message)
         {
             Clients.All.ChatMessageReceiver(username + ":" + message + "\n");
@@ -112,7 +124,7 @@ namespace WebClient
 
         public void CreateMatch()
         {
-            Clients.All.ChatMessageReceiver("Lobby is full, creating match!\n");
+            BroadCastAllMessageDebug("Lobby is full, creating match!\n");
 
             // Get the MMR of all the players in the queue
 
@@ -129,7 +141,7 @@ namespace WebClient
         {
             for(int i = 0; i < g_MatchQueue.Count; i++)
             {
-                Clients.Caller.UpdatePlayerQueueListReceiver(g_MatchQueue[i].strUsername, true);
+                Clients.Caller.UpdatePlayerQueueListReceiver(g_MatchQueue[i].UserName, true);
             }
         }
 
@@ -143,19 +155,40 @@ namespace WebClient
             }
         }
 
-        public void SignUpForMatch(string username, bool fSignup)
+        public void SignUpForMatch(string UserName, bool fSignup)
         {
+            string queryString = "SELECT `basicinfo`.`UserID`,`MMR`,`Win`,`Loss` FROM `basicinfo` RIGHT JOIN `playerdetails` ON `basicinfo`.`UserID` = `playerdetails`.`UserID` WHERE `basicinfo`.`username` LIKE '" + UserName + "'";
+            string UserID = "";
+            uint MMR = 0;
+            uint Win = 0;
+            uint Loss = 0;
+
+            MySqlCommand command = new MySqlCommand(queryString, g_MySQLConnection);
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                UserID = reader[0].ToString();
+                MMR = Convert.ToUInt32(reader[1].ToString());
+                Win = Convert.ToUInt32(reader[2].ToString());
+                Loss = Convert.ToUInt32(reader[3].ToString());
+            }
+            reader.Close();
+
             Player Player = new Player();
-            Player.strUsername = username;
-            Player.intMMR = 1500;
+            Player.UserName = UserName;
+            Player.UserID = UserID;
+            Player.MMR = MMR;
+            Player.Win = Win;
+            Player.Loss = Loss;
+
             if (fSignup)
             {
                 if (g_MatchQueue.Count < MAXPLAYERINGAME)
                 {
                     g_MatchQueue.Add(Player);
 
-                    Clients.All.UpdatePlayerQueueListReceiver(username, true);
-                    Clients.All.ChatMessageReceiver(username + " has signed up!\n");
+                    Clients.All.UpdatePlayerQueueListReceiver(UserName, true);
+                    BroadCastAllMessageDebug(String.Format("{0} ({1} {2}-{3}) has signed up!\n", UserName, MMR, Win, Loss));
 
                     if (g_MatchQueue.Count == MAXPLAYERINGAME)
                     {
@@ -164,28 +197,28 @@ namespace WebClient
                 }
                 else
                 {
-                    Clients.Caller.ChatMessageReceiver("Lobby is full, please wait.\n")
+                    Clients.Caller.ChatMessageReceiver("Lobby is full, please wait.\n");
                 }
             }
             else
             {
                 g_MatchQueue.Remove(Player);
 
-                Clients.All.UpdatePlayerQueueListReceiver(username, false);
-                Clients.All.ChatMessageReceiver(username + " has abandonned!\n");
+                Clients.All.UpdatePlayerQueueListReceiver(UserName, false);
+                BroadCastAllMessageDebug(UserName + " has abandonned!\n");
             }
             
         }
 
         public void ConnectUser(string UserName)
         {
-            Clients.All.ChatMessageReceiver(UserName + " has connected.\n");
+            BroadCastAllMessageDebug(UserName + " has connected.\n");
             g_Connections.Add(UserName, Context.ConnectionId);
 
             // Get player UserID
             string UserID = "";
             UInt32 MMR = 0;
-            string queryString = "SELECT * FROM `basicinfo` WHERE `username` LIKE '" + UserName + "'";
+            string queryString = "SELECT UserID FROM `basicinfo` WHERE `username` LIKE '" + UserName + "'";
             MySqlCommand command = new MySqlCommand(queryString, g_MySQLConnection);
             if (g_MySQLConnection.State != System.Data.ConnectionState.Open)
             {
@@ -194,13 +227,13 @@ namespace WebClient
                     g_MySQLConnection.Open();
                 } catch (Exception e)
                 {
-                    Clients.All.ChatMessageReceiver("Connection Failed:" + e.Message + "\n");
+                    BroadCastAllMessageDebug("Connection Failed:" + e.Message + "\n");
                 }
             }
             
             if (g_MySQLConnection.State != System.Data.ConnectionState.Open)
             {
-                Clients.All.ChatMessageReceiver("Cannot open to database\n");
+                BroadCastAllMessageDebug("Cannot open to database\n");
             }
             MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -212,14 +245,16 @@ namespace WebClient
             // Get player MMR
             command.CommandText = "SELECT * FROM `playerdetails` WHERE `UserID` LIKE '" + UserID + "'";
             command.CommandType = System.Data.CommandType.Text;
-            
+
             reader = command.ExecuteReader();
 
             if (!reader.HasRows)
             {
+                reader.Close();
                 // No row exists, adding a row
-                command.CommandText = "INSERT INTO `playerdetails` (`UserID`, `MMR`, `Win`, `Loss`) VALUES ('" + UserID + "', '1500', '0', '0')";
+                command.CommandText = "INSERT INTO `playerdetails` (`UserID`, `MMR`, `Win`, `Loss`) VALUES ('" + UserID + "', '1500', '0', '0')";    
                 command.ExecuteNonQuery();
+                
                 MMR = 1500;
             }
             else
@@ -228,8 +263,8 @@ namespace WebClient
                 {
                     MMR = Convert.ToUInt32(reader[1]);
                 }
+                reader.Close();
             }
-            reader.Close();
 
             BroadCastAllMessage(UserName + "'s MMR is: " + MMR);
 
@@ -249,8 +284,9 @@ namespace WebClient
             string userName;
             userName = g_Connections.RemoveConnectionId(Context.ConnectionId);
 
-            Clients.All.ChatMessageReceiver(userName + " has disconnected.\n");
+            BroadCastAllMessageDebug(userName + " has disconnected.\n");
             Clients.All.UpdateOnlinePlayerListReceiver(userName, false);
+            SignUpForMatch(userName, false);
 
             return base.OnDisconnected(stopCalled);
         }

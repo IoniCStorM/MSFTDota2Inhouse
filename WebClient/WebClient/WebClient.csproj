@@ -116,6 +116,7 @@
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="registration.php" />
     <Content Include="Rules.html" />
+    <Content Include="Scripts\GamePage.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.2.js" />
