@@ -27,13 +27,13 @@
     ?>
     
     <script>
-		idUser = document.getElementById("idUser");
+        idUser = document.getElementById("idUser");
 
         $.connection.hub.start().done(function () {
             $.connection.messageHub.server.broadCastServerTime();
-			$.connection.messageHub.server.connectUser(idUser.innerHTML);
-			$.connection.messageHub.server.populateCurrentPlayerList();
-			$.connection.messageHub.server.populateCurrentPlayerQueueList();
+            $.connection.messageHub.server.connectUser(idUser.innerHTML);
+            $.connection.messageHub.server.populateCurrentPlayerList();
+            $.connection.messageHub.server.populateCurrentPlayerQueueList();
         });
 
         $.connection.messageHub.client.MessageReceiver = function (message) {
@@ -48,13 +48,18 @@
             UpdatePlayerQueueList(username, Signup);
         }
 
-		$.connection.messageHub.client.UpdateOnlinePlayerListReceiver = function (username, Add) {
+        $.connection.messageHub.client.UpdateOnlinePlayerListReceiver = function (username, Add) {
             UpdatePlayerList(username, Add);
         }
 
-		$.connection.messageHub.client.UpdatePlayerMMRReceiver = function (MMR) {
-			UpdatePlayerMMR(MMR);
-		}
+        $.connection.messageHub.client.UpdatePlayerMMRReceiver = function (MMR) {
+            UpdatePlayerMMR(MMR);
+        }
+        
+        $.connection.messageHub.client.UpdateGameListReceiver = function (GameID, Add) {
+            UpdateGameList(GameID, Add)
+        }
+
     </script>
 
     <table style="width: 100%;">
@@ -76,7 +81,7 @@
                             <select id="sPlayer" size="12" ondblclick="onsPlayerdblclick()" style="width:100%"/>
                         </td>
                     </tr>
-					<tr style="height: 60%; width:20%;">
+                    <tr style="height: 60%; width:20%;">
                         <td style="width: 20%; vertical-align:top">
                             <!--Current game list-->
                             Ongoing Games:

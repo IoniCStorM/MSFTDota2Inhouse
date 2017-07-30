@@ -73,6 +73,26 @@ function UpdatePlayerQueueList(username, Signup) {
     }
 }
 
+function UpdateGameList(GameId, Add) {
+    if(Add)
+    {
+        var newGame = document.createElement("option");
+        newGame.text = GameId;
+        sGames.options.add(newGame);
+    }
+    else
+    {
+        var i;
+        for (i = 0; i < sGames.length; i++) {
+            if (sGames.options[i].text == GameId)
+            {
+                sGames.remove(i);
+                break;
+            }
+        }
+    }
+}
+
 function UpdatePlayerMMR(MMR) {
     UserMMR.innerText = MMR;
 }
